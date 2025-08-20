@@ -9,6 +9,10 @@ export default function RootLayout() {
   return (
     <>
       <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(freezer)" />
+        <Stack.Screen name="(coldroom)" />
+        <Stack.Screen name="(blastfreezer)" />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />

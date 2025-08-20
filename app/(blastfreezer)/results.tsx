@@ -761,6 +761,8 @@ Professional Refrigeration Load Calculation System
             <Text style={styles.infoText}>• Room volume: {results.volume.toFixed(1)} m³</Text>
             <Text style={styles.infoText}>• Temperature difference: {results.temperatureDifference.toFixed(1)}°C</Text>
             <Text style={styles.infoText}>• Batch time: {results.batchHours} hours</Text>
+            <Text style={styles.infoText}>• Door clear opening: {results.conditions.doorClearOpening} mm</Text>
+            <Text style={styles.infoText}>• Air flow per fan: {results.conditions.airFlowPerFan} CFM</Text>
           </View>
           
           <View style={styles.infoCard}>
@@ -770,6 +772,9 @@ Professional Refrigeration Load Calculation System
             <Text style={styles.infoText}>• Ceiling thickness: {results.construction.ceilingThickness}mm</Text>
             <Text style={styles.infoText}>• Floor thickness: {results.construction.floorThickness}mm</Text>
             <Text style={styles.infoText}>• Internal floor: {results.construction.internalFloorThickness}mm</Text>
+            <Text style={styles.infoText}>• Wall U-factor: {results.thermalProperties.wallUFactor.toFixed(3)} W/m²K</Text>
+            <Text style={styles.infoText}>• Ceiling U-factor: {results.thermalProperties.ceilingUFactor.toFixed(3)} W/m²K</Text>
+            <Text style={styles.infoText}>• Floor U-factor: {results.thermalProperties.floorUFactor.toFixed(3)} W/m²K</Text>
           </View>
           
           <View style={styles.infoCard}>
@@ -787,6 +792,8 @@ Professional Refrigeration Load Calculation System
             <Text style={styles.infoText}>• Fan motor load: {results.equipmentSummary.totalFanLoad} kW</Text>
             <Text style={styles.infoText}>• Lighting load: {results.equipmentSummary.totalLightingLoad} kW</Text>
             <Text style={styles.infoText}>• People load: {results.equipmentSummary.totalPeopleLoad.toFixed(3)} kW</Text>
+            <Text style={styles.infoText}>• SHR: {results.engineeringOutputs.SHR.toFixed(3)}</Text>
+            <Text style={styles.infoText}>• Air quantity required: {results.engineeringOutputs.airQtyRequiredCfm.toFixed(0)} CFM</Text>
           </View>
         </View>
       </ScrollView>

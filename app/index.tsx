@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   optionsContainer: {
-    gap: 16,
+    gap: 20,
   },
   optionCard: {
     borderRadius: 16,
@@ -131,9 +131,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   cardGradient: {
-    padding: 24,
+    paddingVertical: 28,
+    paddingHorizontal: 20,
     borderRadius: 16,
     alignItems: 'center',
+    minHeight: 140,
+    justifyContent: 'center',
   },
   cardTitle: {
     fontSize: 20,
