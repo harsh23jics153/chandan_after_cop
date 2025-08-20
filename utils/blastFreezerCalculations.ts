@@ -1,4 +1,4 @@
-import { BLAST_FREEZER_CONSTANTS, BLAST_FREEZER_PRODUCTS } from '@/constants/blastFreezerData';
+import { BLAST_FREEZER_CONSTANTS, BLAST_FREEZER_PRODUCTS, calculateUFactor } from '@/constants/blastFreezerData';
 
 interface RoomData {
   length: string;
@@ -6,6 +6,7 @@ interface RoomData {
   height: string;
   doorWidth: string;
   doorHeight: string;
+  doorClearOpening: string;
   insulationType: string;
   wallThickness: number;
   ceilingThickness: number;
@@ -38,6 +39,7 @@ interface ProductData {
   trayHeatersCapacity: string;
   drainHeatersQty: string;
   drainHeatersCapacity: string;
+  airFlowPerFan: string;
 }
 
 export function calculateBlastFreezerLoad(
@@ -51,6 +53,7 @@ export function calculateBlastFreezerLoad(
   const height = parseFloat(roomData.height) || 3.5;
   const doorWidth = parseFloat(roomData.doorWidth) || 2.1;
   const doorHeight = parseFloat(roomData.doorHeight) || 2.1;
+  const doorClearOpening = parseFloat(roomData.doorClearOpening) || 2100;
   const insulationType = roomData.insulationType || 'PUF';
   const wallThickness = roomData.wallThickness || 150;
   const ceilingThickness = roomData.ceilingThickness || 150;
@@ -80,6 +83,7 @@ export function calculateBlastFreezerLoad(
   const trayHeatersCapacity = parseFloat(productData.trayHeatersCapacity) || 2.2;
   const drainHeatersQty = parseFloat(productData.drainHeatersQty) || 1;
   const drainHeatersCapacity = parseFloat(productData.drainHeatersCapacity) || 0.04;
+  const airFlowPerFan = parseFloat(productData.airFlowPerFan) || 5847;
   
   // Calculate areas and volume
   const wallArea = 2 * (length * height) + 2 * (breadth * height);
@@ -95,16 +99,21 @@ export function calculateBlastFreezerLoad(
   const product = BLAST_FREEZER_PRODUCTS[productData.productType as keyof typeof BLAST_FREEZER_PRODUCTS] || BLAST_FREEZER_PRODUCTS["General Food Items"];
   
   // Calculate storage capacity
-  const maximumStorage = volume * storageCapacity;
+  const maximumStorage = volume * storageCapacity * product.storageEfficiency;
   const storageUtilization = (capacityRequired / maximumStorage) * 100;
+  
+  // Calculate dynamic U-factors based on insulation type and thickness
+  const wallUFactor = calculateUFactor(insulationType, wallThickness);
+  const ceilingUFactor = calculateUFactor(insulationType, ceilingThickness);
+  const floorUFactor = calculateUFactor(insulationType, floorThickness);
   
   // 1. EXACT Excel Formula: Transmission Load (Q = U × A × ΔT / 1000)
   const calculateTransmissionLoad = () => {
     const tempDiff = temperatureDifference;
     
-    const wallLoad = (BLAST_FREEZER_CONSTANTS.uFactors.walls * wallArea * tempDiff) / 1000; // kW
-    const ceilingLoad = (BLAST_FREEZER_CONSTANTS.uFactors.ceiling * ceilingArea * tempDiff) / 1000; // kW
-    const floorLoad = (BLAST_FREEZER_CONSTANTS.uFactors.floor * floorArea * tempDiff) / 1000; // kW
+    const wallLoad = (wallUFactor * wallArea * tempDiff) / 1000; // kW
+    const ceilingLoad = (ceilingUFactor * ceilingArea * tempDiff) / 1000; // kW
+    const floorLoad = (floorUFactor * floorArea * tempDiff) / 1000; // kW
     
     return {
       walls: wallLoad,
@@ -161,7 +170,7 @@ export function calculateBlastFreezerLoad(
     const roomVolume = volume;
     const airChangeRate = BLAST_FREEZER_CONSTANTS.airChangeRate;
     const enthalpyDiff = BLAST_FREEZER_CONSTANTS.airEnthalpyDiff;
-    const hours = operatingHours;
+    const hours = batchHours; // Use batchHours instead of operatingHours as per Excel
     
     // Q = Air changes × Volume × Enthalpy difference × Hours / 3517
     const loadTR = (airChangeRate * roomVolume * enthalpyDiff * hours) / BLAST_FREEZER_CONSTANTS.kjToTR;
@@ -217,6 +226,23 @@ export function calculateBlastFreezerLoad(
   const airLoad = calculateAirChangeLoad();
   const internalLoads = calculateInternalLoads();
   
+  // Calculate additional engineering outputs
+  const loadKJPerBatch = (transmissionLoad.totalTR + productLoad.total + airLoad.loadTR + internalLoads.total) * 3517 * batchHours;
+  const loadKW = (transmissionLoad.totalTR + productLoad.total + airLoad.loadTR + internalLoads.total) * 3.517;
+  
+  // 24-Hour Heat Loads
+  const sensibleHeatKJ24Hr = (productLoad.sensibleAbove + productLoad.sensibleBelow) * 3517 * (24 / batchHours);
+  const latentHeatKJ24Hr = productLoad.latent * 3517 * (24 / batchHours);
+  
+  // SHR Calculation
+  const totalSensibleLoad = transmissionLoad.totalTR + productLoad.sensibleAbove + productLoad.sensibleBelow + internalLoads.total;
+  const totalLatentLoad = productLoad.latent;
+  const totalLoadForSHR = totalSensibleLoad + totalLatentLoad;
+  const SHR = totalLoadForSHR > 0 ? totalSensibleLoad / totalLoadForSHR : 1.0;
+  
+  // Air Quantity Required (CFM)
+  const airQtyRequiredCfm = (totalLoadTR * 3517 * 1000) / (1.2 * 1005 * Math.abs(temperatureDifference));
+  
   // 5. Total Load Calculation (Excel Method)
   const totalLoadTR = transmissionLoad.totalTR + productLoad.total + airLoad.loadTR + internalLoads.total;
   const totalLoadKW = totalLoadTR * 3.517;
@@ -256,7 +282,11 @@ export function calculateBlastFreezerLoad(
       ceilingThickness,
       floorThickness,
       internalFloorThickness,
-      uFactors: BLAST_FREEZER_CONSTANTS.uFactors
+      uFactors: {
+        walls: wallUFactor,
+        ceiling: ceilingUFactor,
+        floor: floorUFactor
+      }
     },
     productInfo: {
       type: productData.productType,
@@ -269,7 +299,9 @@ export function calculateBlastFreezerLoad(
       ambientTemp,
       roomTemp,
       operatingHours,
-      airChangeRate: BLAST_FREEZER_CONSTANTS.airChangeRate
+      airChangeRate: BLAST_FREEZER_CONSTANTS.airChangeRate,
+      doorClearOpening,
+      airFlowPerFan
     },
     breakdown: {
       transmission: transmissionLoad,
@@ -292,6 +324,24 @@ export function calculateBlastFreezerLoad(
     totalKW: finalLoadKW,
     totalBTU: totalBTU,
     dailyEnergyConsumption,
+    
+    // Engineering outputs
+    engineeringOutputs: {
+      loadKJPerBatch: loadKJPerBatch,
+      loadKW: loadKW,
+      sensibleHeatKJ24Hr: sensibleHeatKJ24Hr,
+      latentHeatKJ24Hr: latentHeatKJ24Hr,
+      SHR: SHR,
+      airQtyRequiredCfm: airQtyRequiredCfm
+    },
+    
+    // Thermal properties
+    thermalProperties: {
+      wallUFactor: wallUFactor,
+      ceilingUFactor: ceilingUFactor,
+      floorUFactor: floorUFactor,
+      insulationEfficiency: `${insulationType} - ${BLAST_FREEZER_CONSTANTS.insulationThermalConductivity[insulationType as keyof typeof BLAST_FREEZER_CONSTANTS.insulationThermalConductivity]} W/mK`
+    },
     
     // Equipment summary
     equipmentSummary: {

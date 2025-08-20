@@ -46,11 +46,11 @@ export const BLAST_FREEZER_DEFAULTS = {
 
 // Blast freezer specific thermal constants
 export const BLAST_FREEZER_CONSTANTS = {
-  // Fixed U-factors (W/m²K) based on Excel analysis
-  uFactors: {
-    walls: 0.153,
-    ceiling: 0.153,
-    floor: 0.153
+  // Dynamic U-factor calculation based on insulation thermal conductivity
+  insulationThermalConductivity: {
+    'PUF': 0.023,      // W/mK
+    'EPS': 0.036,      // W/mK  
+    'Rockwool': 0.040  // W/mK
   },
   
   // Air change parameters (higher than standard freezer)
@@ -80,6 +80,13 @@ export const BLAST_FREEZER_CONSTANTS = {
   defaultDoorHeaterCapacity: 0.27, // kW
   defaultTrayHeaterCapacity: 2.2, // kW
   defaultDrainHeaterCapacity: 0.04 // kW
+};
+
+// Dynamic U-factor calculation function
+export const calculateUFactor = (insulationType: string, thickness: number): number => {
+  const k = BLAST_FREEZER_CONSTANTS.insulationThermalConductivity[insulationType as keyof typeof BLAST_FREEZER_CONSTANTS.insulationThermalConductivity];
+  if (!k) return 0.153; // fallback to original fixed value
+  return k / (thickness / 1000); // Convert thickness from mm to meters
 };
 
 // Enhanced product database for blast freezer applications

@@ -16,6 +16,7 @@ export default function BlastFreezerUsageScreen() {
     trayHeatersCapacity: BLAST_FREEZER_DEFAULTS.trayHeatersCapacity.toString(),
     drainHeatersQty: BLAST_FREEZER_DEFAULTS.drainHeatersQty.toString(),
     drainHeatersCapacity: BLAST_FREEZER_DEFAULTS.drainHeatersCapacity.toString(),
+    airFlowPerFan: '5847',
   });
 
   useEffect(() => {
@@ -123,6 +124,17 @@ export default function BlastFreezerUsageScreen() {
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Air Flow Specifications</Text>
+          
+          <InputCard
+            title="Air Flow per Fan (CFM)"
+            value={usage.airFlowPerFan}
+            onChangeText={(value) => handleInputChange('airFlowPerFan', value)}
+            keyboardType="numeric"
+          />
+        </View>
+
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Calculated Loads</Text>
           
           <View style={styles.calculatedCard}>
@@ -161,6 +173,7 @@ export default function BlastFreezerUsageScreen() {
             <Text style={styles.infoText}>• Tray: {usage.trayHeatersQty} × {usage.trayHeatersCapacity} kW = {totalTrayLoad.toFixed(2)} kW</Text>
             <Text style={styles.infoText}>• Drain: {usage.drainHeatersQty} × {usage.drainHeatersCapacity} kW = {totalDrainLoad.toFixed(2)} kW</Text>
             <Text style={styles.infoText}>• Total heater load: {totalHeaterLoad.toFixed(2)} kW</Text>
+            <Text style={styles.infoText}>• Air flow per fan: {usage.airFlowPerFan} CFM</Text>
           </View>
         </View>
       </ScrollView>

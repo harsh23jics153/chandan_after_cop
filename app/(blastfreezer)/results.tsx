@@ -536,7 +536,7 @@ Professional Refrigeration Load Calculation System
             <View style={styles.tableRow}>
               <Text style={[styles.tableCell, { flex: 2 }]}>Walls</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{results.areas.wall.toFixed(1)}</Text>
-              <Text style={[styles.tableCell, { flex: 1 }]}>{results.construction.uFactors.walls.toFixed(3)}</Text>
+              <Text style={[styles.tableCell, { flex: 1 }]}>{results.thermalProperties.wallUFactor.toFixed(3)}</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{results.temperatureDifference.toFixed(0)}</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{results.breakdown.transmission.walls.toFixed(2)}</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{results.breakdown.transmission.wallsTR.toFixed(3)}</Text>
@@ -545,7 +545,7 @@ Professional Refrigeration Load Calculation System
             <View style={styles.tableRow}>
               <Text style={[styles.tableCell, { flex: 2 }]}>Ceiling</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{results.areas.ceiling.toFixed(1)}</Text>
-              <Text style={[styles.tableCell, { flex: 1 }]}>{results.construction.uFactors.ceiling.toFixed(3)}</Text>
+              <Text style={[styles.tableCell, { flex: 1 }]}>{results.thermalProperties.ceilingUFactor.toFixed(3)}</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{results.temperatureDifference.toFixed(0)}</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{results.breakdown.transmission.ceiling.toFixed(2)}</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{results.breakdown.transmission.ceilingTR.toFixed(3)}</Text>
@@ -554,7 +554,7 @@ Professional Refrigeration Load Calculation System
             <View style={styles.tableRow}>
               <Text style={[styles.tableCell, { flex: 2 }]}>Floor</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{results.areas.floor.toFixed(1)}</Text>
-              <Text style={[styles.tableCell, { flex: 1 }]}>{results.construction.uFactors.floor.toFixed(3)}</Text>
+              <Text style={[styles.tableCell, { flex: 1 }]}>{results.thermalProperties.floorUFactor.toFixed(3)}</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{results.temperatureDifference.toFixed(0)}</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{results.breakdown.transmission.floor.toFixed(2)}</Text>
               <Text style={[styles.tableCell, { flex: 1 }]}>{results.breakdown.transmission.floorTR.toFixed(3)}</Text>

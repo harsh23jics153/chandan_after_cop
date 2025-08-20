@@ -13,6 +13,7 @@ export default function BlastFreezerRoomScreen() {
     height: BLAST_FREEZER_DEFAULTS.height.toString(),
     doorWidth: BLAST_FREEZER_DEFAULTS.doorWidth.toString(),
     doorHeight: BLAST_FREEZER_DEFAULTS.doorHeight.toString(),
+    doorClearOpening: '2100',
   });
 
   useEffect(() => {
@@ -96,6 +97,13 @@ export default function BlastFreezerRoomScreen() {
             onChangeText={(value) => handleInputChange('doorHeight', value)}
             keyboardType="numeric"
           />
+          
+          <InputCard
+            title="Door Clear Opening (mm)"
+            value={dimensions.doorClearOpening}
+            onChangeText={(value) => handleInputChange('doorClearOpening', value)}
+            keyboardType="numeric"
+          />
         </View>
 
         <View style={styles.section}>
@@ -120,6 +128,11 @@ export default function BlastFreezerRoomScreen() {
             <View style={styles.calculatedRow}>
               <Text style={styles.calculatedLabel}>Door Area</Text>
               <Text style={styles.calculatedValue}>{doorArea.toFixed(1)} m²</Text>
+            </View>
+            
+            <View style={styles.calculatedRow}>
+              <Text style={styles.calculatedLabel}>Door Clear Opening</Text>
+              <Text style={styles.calculatedValue}>{parseFloat(dimensions.doorClearOpening) || 2100} mm</Text>
             </View>
             
             <View style={[styles.calculatedRow, styles.totalRow]}>
