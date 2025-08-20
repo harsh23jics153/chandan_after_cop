@@ -132,7 +132,10 @@ export default function BlastFreezerConstructionScreen() {
             <View style={[styles.propertyRow, styles.highlightRow]}>
               <Text style={[styles.propertyLabel, styles.highlightLabel]}>U-Factor (Fixed):</Text>
               <Text style={[styles.propertyValue, styles.highlightValue]}>{BLAST_FREEZER_CONSTANTS.uFactors.walls.toFixed(3)} W/m²K</Text>
-            </View>
+            <Text style={styles.infoText}>• Dynamic U-factor: Based on insulation type and thickness</Text>
+            <Text style={styles.infoText}>• PUF thermal conductivity: 0.023 W/mK</Text>
+            <Text style={styles.infoText}>• EPS thermal conductivity: 0.036 W/mK</Text>
+            <Text style={styles.infoText}>• Rockwool thermal conductivity: 0.040 W/mK</Text>
           </View>
         </View>
 
@@ -151,6 +154,8 @@ export default function BlastFreezerConstructionScreen() {
 }
 
 const styles = StyleSheet.create({
+          }
+  )
   container: {
     flex: 1,
   },
